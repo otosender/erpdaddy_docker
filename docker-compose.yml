@@ -214,7 +214,6 @@ volumes:
   redis-queue-data:
   sites:
   logs:
-  letsencrypt:
 
 networks:
   frappe_network:

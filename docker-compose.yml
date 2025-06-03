@@ -1,27 +1,6 @@
 version: "3"
 
 services:
-  reverse-proxy:
-    image: traefik:v3.1
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entryPoints.websecure.address=:443"
-      - "--certificatesresolvers.waharesolver.acme.tlschallenge=true"
-      - "--certificatesresolvers.waharesolver.acme.email=eji@aiconec.com"
-      - "--certificatesresolvers.waharesolver.acme.storage=/letsencrypt/acme.json"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
-    volumes:
-      - letsencrypt:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock
-
   backend:
     image: ghcr.io/otosender/erpdaddy:latest
     networks:
@@ -128,9 +107,10 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.frontend.rule=Host(`erp.aiconec.com`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
-      - "traefik.http.routers.frontend.tls.certresolver=waharesolver"
+      - "traefik.http.routers.frontend.tls.certresolver=suiteresolver"
     networks:
       - frappe_network
+      - traefik
     depends_on:
       - websocket
     deploy:
@@ -150,8 +130,6 @@ services:
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
-    ports:
-      - "8080:8080"
 
   queue-long:
     image: ghcr.io/otosender/erpdaddy:latest
@@ -241,3 +219,5 @@ volumes:
 networks:
   frappe_network:
     driver: bridge
+  traefik:
+    external: true

@@ -129,6 +129,7 @@ services:
       - "traefik.http.routers.frontend.rule=Host(`erp.aiconec.com`)"
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=waharesolver"
+      - "traefik.http.services.frontend.loadbalancer.server.port=8080"
     networks:
       - frappe_network
     depends_on:
@@ -150,8 +151,6 @@ services:
     volumes:
       - sites:/home/frappe/frappe-bench/sites
       - logs:/home/frappe/frappe-bench/logs
-    ports:
-      - "8080:8080"
 
   queue-long:
     image: ghcr.io/otosender/erpdaddy:latest
